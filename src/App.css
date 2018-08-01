@@ -26,6 +26,13 @@ h2{
   justify-content: center;
 }
 
+.logo {
+  display: block;
+  margin: 10px auto;
+  width: 50%;
+  height: 50%;
+}
+
 .container {
   margin: 2vw;
   box-shadow: 1px 1px 5px black;

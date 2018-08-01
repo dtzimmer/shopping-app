@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Logo from './Shopping.jpg'
 import firebase, { auth, provider } from './firebase.js';
 
 class App extends Component {
@@ -98,9 +99,8 @@ class App extends Component {
                         :
                         <button onClick={this.login}>Log In</button>
                     }
-                    <h1>Shopping Brain</h1>
-                    <div className="centericon">
-                        <i className="fas fa-shopping-bag fa-5x"></i>
+                    <div>
+                        <img className="logo" src={Logo} alt=""/>
                     </div>
                     <h2>Organize your shopping</h2>
                 </header>
