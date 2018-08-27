@@ -1,152 +1,210 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from 'react'
+import './App.css'
 import Logo from './Shopping.jpg'
-import firebase, { auth, provider } from './firebase.js';
+import firebase, { auth, provider } from './firebase.js'
+
+const updateItem = (db, itemId, item = {}) => {
+  const itemRef = db.ref(`items/${itemId}`)
+  itemRef.set(item)
+}
+
+const createItem = (db, item = {}) => {
+  const itemsRef = db.ref('items')
+  itemsRef.push(item)
+}
+
 
 class App extends Component {
-    constructor() {
-        super();
-        this.state = {
-            location: '',
-            things: '',
-            notes: '',
-            items: [],
+  constructor() {
+    super()
+    this.state = {
+      location: '',
+      things: '',
+      notes: '',
+      items: [],
+      user: null,
+    }
+    // this.handleChange = this.handleChange.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
+    // this.login = this.login.bind(this);
+    // this.logout = this.logout.bind(this);
+  }
+
+
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+  logout = () => {
+    auth.signOut()
+        .then(() => {
+          this.setState({
             user: null
-        }
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.login = this.login.bind(this);
-        this.logout = this.logout.bind(this);
+          })
+        })
+  }
+  login = () => {
+    auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user
+          this.setState({
+            user
+          })
+        })
+  }
+
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+
+    const db = firebase.database()
+
+    const { itemId } = this.state
+
+    const item = {
+      locate: this.state.location,
+      thing: this.state.things,
+      note: this.state.notes
     }
 
+    !itemId ?
+      createItem(db, item) :
+      updateItem(db, itemId, item)
 
-    handleChange(e) {
-        this.setState({
-            [e.target.name]: e.target.value
-        });
-    }
-    logout() {
-        auth.signOut()
-            .then(() => {
-                this.setState({
-                    user: null
-                });
-            });
-    }
-    login() {
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                const user = result.user;
-                this.setState({
-                    user
-                });
-            });
-    }
+    // if (!itemId) {
+    //
+    //   // const itemsRef = db.ref('items')
+    //   // itemsRef.push(item)
+    //   createItem(db, item)
+    //
+    // } else {
+    //   // const itemRef = db.ref(`items/${itemId}`)
+    //   // itemRef.set({
+    //   //   locate: this.state.location,
+    //   //   thing: this.state.things,
+    //   //   note: this.state.notes
+    //   // })
+    //
+    //   updateItem(db, itemId, item)
+    // }
+
+    this.setState({
+      location: '',
+      things: '',
+      notes: ''
+    })
 
 
-    handleSubmit(e) {
-        e.preventDefault();
-        const itemsRef = firebase.database().ref('items');
-        const item = {
-            locate: this.state.location,
-            thing: this.state.things,
-            note: this.state.notes
-        }
-        itemsRef.push(item);
-        this.setState({
-            location: '',
-            things: '',
-            notes: ''
-        });
-    }
+  }
 
-    componentDidMount() {
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                this.setState({ user });
-            }
-        });
-        const itemsRef = firebase.database().ref('items');
-        itemsRef.on('value', (snapshot) => {
-            let items = snapshot.val();
-            let newState = [];
-            for (let item in items) {
-                newState.push({
-                    id: item,
-                    locate: items[item].locate,
-                    thing: items[item].thing,
-                    note: items[item].note
-                });
-            }
-            this.setState({
-                items: newState
-            });
-        });
-    }
 
-    removeItem(itemId) {
-        const itemRef = firebase.database().ref(`/items/${itemId}`);
-        itemRef.remove();
-    }
+  async componentDidMount() {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ user })
+      }
+    })
+    const itemsRef = firebase.database().ref('items')
+    itemsRef.on('value', (snapshot) => {
+      let items = snapshot.val()
+      let newState = []
+      for (let item in items) {
+        newState.push({
+          id: item,
+          locate: items[item].locate,
+          thing: items[item].thing,
+          note: items[item].note
+        })
+      }
+      this.setState({
+        items: newState
+      })
+    })
+  }
 
-    render() {
+  removeItem(itemId) {
+    const itemRef = firebase.database().ref(`/items/${itemId}`)
+    itemRef.remove()
+  }
 
-        return (
-            <div className='app'>
-                <header>
-                    {this.state.user ?
-                        <button onClick={this.logout}>Log Out</button>
-                        :
-                        <button onClick={this.login}>Log In</button>
-                    }
-                    <div>
-                        <img className="logo" src={Logo} alt=""/>
-                    </div>
-                    <h2>Organize your shopping</h2>
-                </header>
-                {this.state.user ?
-                    <div>
-                        <div className='user-profile'>
-                            <img src={this.state.user.photoURL} alt="profile pic"/>
-                        </div>
-                    </div>
-                    :
-                    <div className='wrapper'>
-                        <div className='loginmessage'>
-                            <p>You must be logged in to see the shopping list and submit to it.</p>
-                        </div>
-                    </div>
-                }
-                <div className='container'>
-                    <section className="add-item">
-                        <h2>Create a Shopping Item</h2>
-                        <form onSubmit={this.handleSubmit}>
-                            <input type="text" name="things" placeholder="What are you buying?" onChange={this.handleChange} value={this.state.things} />
-                            <input type="text" name="location" placeholder="Where is it sold?" onChange={this.handleChange} value={this.state.location} />
-                            <input type="text" name="notes" placeholder="Notes" onChange={this.handleChange} value={this.state.notes} />
-                            <button>Add to Shopping List</button>
-                        </form>
-                    </section>
-                </div>
+  populateFields = (itemId) => {
+    const itemsRef = firebase.database().ref(`/items/${itemId}`)
+    itemsRef.on('value', (snapshot) => {
+      let items = snapshot.val()
+      this.setState({ location: items.locate, things: items.thing, notes: items.note, itemId })
+    })
+  }
 
-                <section className='display-item'>
-                    <div className='wrapper'>
-                        <ul>
-                            {this.state.items.map((item) => {
-                                return (
-                                    <li key={item.id}>
-                                        <h3>{item.locate}</h3>
-                                        <p>{item.thing}</p>
-                                        <p>{item.note}</p>
-                                        <button onClick={() => this.removeItem(item.id)}>Bought?</button>
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                    </div>
-                </section>
+  handleUpdate(itemId) {
+    const itemRef = firebase.database().ref(`/items/${itemId}`)
+    itemRef.remove()
+  }
+
+  render() {
+
+    return (
+      <div className='app'>
+        <header>
+          {this.state.user ?
+            <button onClick={this.logout}>Log Out</button>
+            :
+            <button onClick={this.login}>Log In</button>
+          }
+          <div>
+            <img className="logo" src={Logo} alt="" />
+          </div>
+          <h2>Organize your shopping</h2>
+        </header>
+        {this.state.user ?
+          <div>
+            <div className='user-profile'>
+              <img src={this.state.user.photoURL} alt="profile pic" />
             </div>
-        );
-    }
+          </div>
+          :
+          <div className='wrapper'>
+            <div className='loginmessage'>
+              <p>You must be logged in to see the shopping list and submit to it.</p>
+            </div>
+          </div>
+        }
+        <div className='container'>
+          <section className="add-item">
+            <h2>Create a Shopping Item</h2>
+            <form onSubmit={this.handleSubmit}>
+              <input type="text" name="location" placeholder="Where is it sold?" onChange={this.handleChange}
+                     value={this.state.location} />
+              <input type="text" name="things" placeholder="What are you buying?" onChange={this.handleChange}
+                     value={this.state.things} />
+              <input type="text" name="notes" placeholder="Notes" onChange={this.handleChange}
+                     value={this.state.notes} />
+              <button>Add to Shopping List</button>
+              <button>Save Update</button>
+            </form>
+          </section>
+        </div>
+
+        <section className='display-item'>
+          <div className='wrapper'>
+            <ul>
+              {this.state.items.map((item) => {
+                return (
+                  <li key={item.id}>
+                    <h3>{item.locate}</h3>
+                    <p>{item.thing}</p>
+                    <p>{item.note}</p>
+                    <button onClick={() => this.removeItem(item.id)}>Bought?</button>
+                    <button onClick={() => this.populateFields(item.id)}>Update?</button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        </section>
+      </div>
+    )
+  }
 }
-export default App;
+
+export default App

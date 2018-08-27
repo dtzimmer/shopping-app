@@ -8,7 +8,7 @@ header {
 }
 
 header h1{
-  font-family: Kaushan Script, sans-serif;
+  font-family: sans-serif;
   text-align: center;
 }
 
@@ -29,8 +29,8 @@ h2{
 .logo {
   display: block;
   margin: 10px auto;
-  width: 50%;
-  height: 50%;
+  width: 20%;
+  height: 20%;
 }
 
 .container {
@@ -86,7 +86,7 @@ ul {
 li {
   width: 26%;
   min-width: 250px;
-  font-family: Bad Script, sans-serif;
+  font-family: sans-serif;
   list-style-type: none; /*elminates bullets*/
   margin-right: 50px; /*keeps spacing between each box*/
   background-color: whitesmoke;
