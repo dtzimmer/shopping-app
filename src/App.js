@@ -3,12 +3,13 @@ import './App.css'
 import Logo from './Shopping.jpg'
 import firebase, { auth, provider } from './firebase.js'
 
-const updateItem = (db, itemId, item = {}) => {
+
+const updateItem = (db, itemId, item = {}) => { //UPDATE Function
   const itemRef = db.ref(`items/${itemId}`)
   itemRef.set(item)
 }
 
-const createItem = (db, item = {}) => {
+const createItem = (db, item = {}) => {  //POST Function
   const itemsRef = db.ref('items')
   itemsRef.push(item)
 }
@@ -24,10 +25,6 @@ class App extends Component {
       items: [],
       user: null,
     }
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
-    // this.login = this.login.bind(this);
-    // this.logout = this.logout.bind(this);
   }
 
 
@@ -36,6 +33,8 @@ class App extends Component {
       [e.target.name]: e.target.value
     })
   }
+
+
   logout = () => {
     auth.signOut()
         .then(() => {
@@ -44,6 +43,8 @@ class App extends Component {
           })
         })
   }
+
+
   login = () => {
     auth.signInWithPopup(provider)
         .then((result) => {
@@ -72,27 +73,11 @@ class App extends Component {
       createItem(db, item) :
       updateItem(db, itemId, item)
 
-    // if (!itemId) {
-    //
-    //   // const itemsRef = db.ref('items')
-    //   // itemsRef.push(item)
-    //   createItem(db, item)
-    //
-    // } else {
-    //   // const itemRef = db.ref(`items/${itemId}`)
-    //   // itemRef.set({
-    //   //   locate: this.state.location,
-    //   //   thing: this.state.things,
-    //   //   note: this.state.notes
-    //   // })
-    //
-    //   updateItem(db, itemId, item)
-    // }
-
     this.setState({
       location: '',
       things: '',
-      notes: ''
+      notes: '',
+      itemId: ''
     })
 
 
@@ -136,10 +121,10 @@ class App extends Component {
     })
   }
 
-  handleUpdate(itemId) {
-    const itemRef = firebase.database().ref(`/items/${itemId}`)
-    itemRef.remove()
-  }
+  // handleUpdate(itemId) {
+  //   const itemRef = firebase.database().ref(`/items/${itemId}`)
+  //   itemRef.remove()
+  // }
 
   render() {
 
