@@ -69,9 +69,7 @@ class App extends Component {
       note: this.state.notes
     }
 
-    !itemId ?
-      createItem(db, item) :
-      updateItem(db, itemId, item)
+    !itemId ? createItem(db, item) : updateItem(db, itemId, item)
 
     this.setState({
       location: '',
@@ -121,10 +119,6 @@ class App extends Component {
     })
   }
 
-  // handleUpdate(itemId) {
-  //   const itemRef = firebase.database().ref(`/items/${itemId}`)
-  //   itemRef.remove()
-  // }
 
   render() {
 
@@ -148,15 +142,14 @@ class App extends Component {
             </div>
           </div>
           :
-          <div className='wrapper'>
+          <div>
             <div className='loginmessage'>
               <p>You must be logged in to see the shopping list and submit to it.</p>
             </div>
           </div>
         }
-        <div className='container'>
-          <section className="add-item">
-            <h2>Create a Shopping Item</h2>
+          <div className="add-item">
+            <h3>Create a Shopping Item</h3>
             <form onSubmit={this.handleSubmit}>
               <input type="text" name="location" placeholder="Where is it sold?" onChange={this.handleChange}
                      value={this.state.location} />
@@ -164,14 +157,12 @@ class App extends Component {
                      value={this.state.things} />
               <input type="text" name="notes" placeholder="Notes" onChange={this.handleChange}
                      value={this.state.notes} />
-              <button>Add to Shopping List</button>
-              <button>Save Update</button>
+              <button>Add/Save to Shopping List</button>
             </form>
-          </section>
-        </div>
+          </div>
 
         <section className='display-item'>
-          <div className='wrapper'>
+          <div>
             <ul>
               {this.state.items.map((item) => {
                 return (
