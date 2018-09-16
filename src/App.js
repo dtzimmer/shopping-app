@@ -42,6 +42,7 @@ class App extends Component {
             user: null
           })
         })
+    window.location.reload();
   }
 
 
@@ -52,6 +53,9 @@ class App extends Component {
           this.setState({
             user
           })
+          if (user) {
+            window.location.reload();
+          }
         })
   }
 
